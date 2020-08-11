@@ -1,5 +1,6 @@
 package com.example.travelmantics;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,18 +82,31 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.DealViewHolder
         return deals.size();
     }
 
-    public class  DealViewHolder extends RecyclerView.ViewHolder{
+    public class  DealViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvTitle;
         TextView tvPrice;
+        TextView tvDescription;
         public DealViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvDescription = (TextView) itemView.findViewById(R.id.tvDescription);
             tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
+            itemView.setOnClickListener(this);
         }
 
         public void  bind(TravelDeal deal){
             tvTitle.setText(deal.getTitle());
             tvPrice.setText("Ksh. "+ deal.getPrice()+"/=");
+            tvDescription.setText(deal.getDescription());
+        }
+
+        @Override
+        public void onClick(View view) {
+            int positionClicked = getAdapterPosition();
+            TravelDeal selectedDeal = deals.get(positionClicked);
+            Intent intent = new Intent(view.getContext(), DealActivity.class);
+            intent.putExtra("Deal", selectedDeal);
+            view.getContext().startActivity(intent);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.travelmantics;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,13 +14,14 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class InsertActivity extends AppCompatActivity {
+public class DealActivity extends AppCompatActivity {
 
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mFirebaseReference;
     EditText txtTitle;
     EditText txtPrice;
     EditText txtDescription;
+    private TravelDeal deal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,19 @@ public class InsertActivity extends AppCompatActivity {
         txtTitle = (EditText) findViewById(R.id.txtTitle);
         txtPrice = (EditText) findViewById(R.id.txtPrice);
         txtDescription = (EditText) findViewById(R.id.txtDescription);
+
+        Intent intent = getIntent();
+        TravelDeal deal = (TravelDeal) intent.getSerializableExtra("Deal");
+
+        //Check if deal is empty
+        if (deal == null){
+            deal = new TravelDeal();
+        }
+        this.deal =deal;
+        txtTitle.setText(deal.getTitle());
+        txtDescription.setText(deal.getDescription());
+        txtPrice.setText(deal.getPrice());
+
     }
 
     @Override
@@ -48,6 +63,8 @@ public class InsertActivity extends AppCompatActivity {
                 saveDeal();
                 Toast.makeText(this, "Deal saved", Toast.LENGTH_LONG).show();
                 clean();
+                Intent intent = new Intent(this, ListActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
