@@ -22,13 +22,14 @@ public class DealActivity extends AppCompatActivity {
     EditText txtPrice;
     EditText txtDescription;
     private TravelDeal deal;
+    private ListActivity ListActivity = new ListActivity();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.insert_activity);
 
-        FirebaseUtil.openFbReference("traveldeals");
+        FirebaseUtil.openFbReference("traveldeals", ListActivity);
         mFirebaseDatabase = FirebaseUtil.mFirebaseDatabase;
         mFirebaseReference = FirebaseUtil.mDatabaseReference;
         txtTitle = (EditText) findViewById(R.id.txtTitle);
@@ -53,6 +54,15 @@ public class DealActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.save_menu, menu);
+        if (FirebaseUtil.isAdmin == true){
+            menu.findItem(R.id.delete_menu).setVisible(true);
+            menu.findItem(R.id.save_menu).setVisible(true);
+            enableEditText(true);
+        } else {
+            menu.findItem(R.id.delete_menu).setVisible(false);
+            menu.findItem(R.id.save_menu).setVisible(false);
+            enableEditText(false);
+        }
         return true;
     }
 
@@ -109,6 +119,12 @@ public class DealActivity extends AppCompatActivity {
     private void backToList(){
         Intent intent = new Intent(this, ListActivity.class);
         startActivity(intent);
+    }
+
+    private void enableEditText(boolean isEnabled){
+        txtTitle.setEnabled(isEnabled);
+        txtPrice.setEnabled(isEnabled);
+        txtDescription.setEnabled(isEnabled);
     }
 
 }
