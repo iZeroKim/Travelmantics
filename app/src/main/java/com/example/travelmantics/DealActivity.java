@@ -17,7 +17,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
@@ -117,16 +120,22 @@ public class DealActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 42 && resultCode == RESULT_OK){
-            Uri imageUri = data.getData();
-            StorageReference ref = FirebaseUtil.mStorageReference.child(imageUri.getLastPathSegment());
-            ref.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            final Uri imageUri = data.getData();
+            final StorageReference ref = FirebaseUtil.mStorageReference.child(imageUri.getLastPathSegment());
+            ref.putFile(imageUri).addOnSuccessListener(this,new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String url = taskSnapshot.getStorage().getDownloadUrl().toString();
-                    deal.setImageUrl(url);
-                    showImage(url);
+                    FirebaseUtil.mStorageReference.child(imageUri.getLastPathSegment()).getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            deal.setImageUrl(task.getResult().toString());
+                            showImage(task.getResult().toString());
+                        }
+                    });
                 }
             });
+
+
         }
     }
 
@@ -145,7 +154,6 @@ public class DealActivity extends AppCompatActivity {
             mFirebaseReference.push().setValue(deal);
         } else {
             mFirebaseReference.child(deal.getId()).setValue(deal);
-
         }
     }
 
